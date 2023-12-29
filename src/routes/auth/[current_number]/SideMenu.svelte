@@ -54,10 +54,6 @@
 			>
 		</button>
 	</div>
-	<div class="flex items-center gap-2">
-		<label class="label" for="show_sent">Mostra chat senza risposte:</label>
-		<input id="show_sent" type="checkbox" class="toggle" bind:checked={$show_sent} />
-	</div>
 
 	<div class="flex-grow flex flex-col rounded-xl bg-base-300 p-2 gap-3 h-full overflow-scroll">
 		<LoggedIn>

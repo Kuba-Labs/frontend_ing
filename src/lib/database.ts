@@ -174,15 +174,11 @@ export const get_contacts = async (to_number: number, show_sent: boolean): Promi
     if (!to_number) {
         throw new Error("Calling get_contacts with no number")
     }
-    // const { data, error } = await supabaseClient.rpc("get_contacts", { to_number, show_sent });
+
     const query = supabaseClient
         .from("contact_msg_tags")
         .select("*")
         .eq("owner", to_number)
-    // .eq("");
-    if (!show_sent) {
-        query.eq("replied", true);
-    }
     const { data, error } = await query;
     // console.log(data)
 
@@ -207,19 +203,18 @@ export const get_messages = async (caller_number: number, chat_number: number): 
     if (!caller_number || !chat_number) {
         throw new Error("campi mancanti")
     }
-    const { data, error } = await supabaseClient
-        .from("messages")
-        .select("*")
-        .or(`and(from.eq.${caller_number},to.eq.${chat_number}),and(from.eq.${chat_number},to.eq.${caller_number})`)
-        .order("timestamp", { ascending: true })
-    // const { data, error } = await supabaseClient
-    //     .rpc('get_messages', { current_number: caller_number, chat_number });
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile caricare i messaggi")
-        return [];
-    }
-    return data;
+    fetch(`http://ingegneria.eu-4.evennode.com/?${caller_number}&${chat_number}`)
+    .then((data)=>{
+        console.log(data);
+        if (!data) {
+            console.log(data)
+            toasts.error("Impossibile caricare i messaggi, non ce ne sono")
+            return [];
+        }
+        return data;
+    });
+    toasts.error("Errore fatale nel caricamento messaggi")
+    return [];
 }
 
 export const get_boradcasts = async (owner: number): Promise<Database["public"]["Views"]["broadcasts_summary"]["Row"][]> => {
