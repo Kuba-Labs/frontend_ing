@@ -32,7 +32,10 @@
 
 	<div class="flex gap-4 flex-shrink">
 		{#if available_numbers[0]}
-			<a class="btn flex-grow bg-base-300" href={`/auth/${available_numbers[0].wa_id}`}>
+			<a
+				class="btn flex-grow bg-base-300"
+				href={`/auth/${$page.params.current_number || available_numbers[0].wa_id}`}
+			>
 				<svg
 					class="loading-sm"
 					width="24"
@@ -50,6 +53,14 @@
 				>
 				Messages
 				<!-- <span class="badge badge-sm">99+</span> -->
+			</a>
+		{/if}
+		{#if $page.params.current_number}
+			<a
+				class="btn flex-grow bg-base-300"
+				href={`/auth/${$page.params.current_number}/statistiche`}
+			>
+				Statistiche
 			</a>
 		{/if}
 
