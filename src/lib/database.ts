@@ -5,7 +5,7 @@ import { data_loading, toasts, type Template } from "./storage";
 
 const SUPABASE_URL = "https://cbgvduembguyfxjbifpb.supabase.co"
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZ3ZkdWVtYmd1eWZ4amJpZnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDI5ODM1MjEsImV4cCI6MjAxODU1OTUyMX0.G9q2dhfHgjacUYW1cBXel-0CCfJFS-epKDT9h3CS04I"
-const BASE_URL = "http://ingegneria.eu-4.evennode.com/";
+const BASE_URL = "http://ingegneria.eu-4.evennode.com";
 
 
 export type RowOf<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
