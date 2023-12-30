@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { remove_tag, type ContactType, add_tag } from '$lib/database';
+	import { remove_tag,remove_customer, type ContactType, add_tag } from '$lib/database';
 	import { toasts } from '$lib/storage';
 	import Icon from '@iconify/svelte';
 
@@ -23,7 +23,7 @@
 				<button
 					class="btn btn-neutral btn-xs"
 					on:click={() => {
-						remove_tag(ecom_wa_id, wa_id, tag);
+						remove_tag(ecom_wa_id,wa_id,"unsubscribed");
 					}}
 				>
 					<Icon icon="material-symbols-light:remove-rounded" height="1rem" />
@@ -34,18 +34,15 @@
 	</div>
 
 	<div class="flex flex-col gap-2">
-		{#each missing_tags as tag}
 			<div class="badge badge-neutral gap-2 h-auto">
 				<button
 					class="btn btn-neutral btn-xs"
 					on:click={() => {
-						add_tag(ecom_wa_id, wa_id, tag);
+						remove_customer(wa_id,ecom_wa_id);
 					}}
 				>
 					<Icon icon="material-symbols-light:add" height="1rem" />
 				</button>
-				{tag}
 			</div>
-		{/each}
 	</div>
 </div>

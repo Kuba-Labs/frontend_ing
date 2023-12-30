@@ -28,12 +28,16 @@ export const supabaseClient = createClient<Database>(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const send_message_raw = async (from: number, to: number, content: any) => {
-    return supabaseClient.functions.invoke('send_message', {
-        body: {
-            from,
-            to,
-            content
-        }
+    return await fetch('http://localhost:9999/api/mandamessaggio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to,
+        content,
+      }),
     });
 }
 export async function send_message(template: string, input: string, from: number, to: number) {
@@ -203,132 +207,36 @@ export const get_messages = async (caller_number: number, chat_number: number): 
     if (!caller_number || !chat_number) {
         throw new Error("campi mancanti")
     }
-    fetch(`http://ingegneria.eu-4.evennode.com/?${caller_number}&${chat_number}`)
+
+    const response = await fetch(`http://localhost:9999/api/messaggi?from=${caller_number}&to=${chat_number}`);
+    const messages = await response.json();
+    console.log(messages);
+    if(!messages || !response.ok){
+        toasts.error("Impossibile caricare i messaggi")
+        return [];
+    }
+    else{
+        return messages;
+    }
+
+    /*fetch(`http://localhost:9999/api/messaggi?from=${caller_number}&to=${chat_number}`)
     .then((data)=>{
         console.log(data);
+        if(data.ok){
+            console.log("test!");
+        }
         if (!data) {
-            console.log(data)
+            console.log(data+"minchei")
             toasts.error("Impossibile caricare i messaggi, non ce ne sono")
             return [];
         }
         return data;
-    });
+    });*/
     toasts.error("Errore fatale nel caricamento messaggi")
     return [];
 }
 
-export const get_boradcasts = async (owner: number): Promise<Database["public"]["Views"]["broadcasts_summary"]["Row"][]> => {
-    const { data, error } = await supabaseClient
-        .from("broadcasts_summary")
-        .select("*")
-        .eq("owner", owner)
 
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile caricare i broadcasts")
-        return [];
-    }
-
-    return data;
-}
-
-export const create_broadcast = async (owner: number, broadcast_name: string): Promise<void> => {
-    const { data, error } = await supabaseClient
-        .from("broadcasts")
-        .insert({ broadcast_name, owner })
-        .select()
-        .single()
-
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile creare il broadcast")
-        return;
-    }
-
-    data_loading.reload();
-    return;
-}
-
-export interface BroadcastWithContacts extends RowOf<"broadcasts"> {
-    broadcasts_contacts: RowOf<"broadcasts_contacts">[]
-}
-export const get_boradcast_contacts = async (owner: number, broadcast_id_int: number): Promise<BroadcastWithContacts> => {
-    const { data, error } = await supabaseClient
-        .from("broadcasts")
-        .select("*, broadcasts_contacts (*)")
-        .eq("id", broadcast_id_int)
-        .eq("owner", owner)
-        .single()
-
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile caricare il broadcast")
-        throw new Error("Impossibile caricare il broadcast")
-        // return;
-    }
-
-    return data;
-}
-
-export const insert_broadcast_contact = async (broadcast_id: number, wa_ids: number[]): Promise<void> => {
-    const { data, error } = await supabaseClient
-        .from("broadcasts_contacts")
-        .insert(wa_ids.map(wa_id => { return { broadcast: broadcast_id, wa_id } }))
-        .select()
-
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile aggiungere il/i contatto/i")
-        return;
-    }
-
-    data_loading.reload();
-    return;
-}
-
-export const remove_broadcast_contact = async (broadcast_id: number, wa_id: number): Promise<void> => {
-    const { data, error } = await supabaseClient
-        .from("broadcasts_contacts")
-        .delete()
-        .eq("broadcast", broadcast_id)
-        .eq("wa_id", wa_id)
-        .select()
-        .single()
-
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile rimuovere il contatto")
-        return;
-    }
-
-    data_loading.reload();
-    return;
-}
-
-export const update_broadcast = async (
-    id: number,
-    updates: {
-        broadcast_name?: string;
-        send_started?: boolean;
-        message_content?: any;
-    }
-): Promise<void> => {
-    const { data, error } = await supabaseClient
-        .from("broadcasts")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single()
-
-    if (!data || error) {
-        console.log(error, data)
-        toasts.error("Impossibile aggiornare il broadcast")
-        return;
-    }
-    toasts.success("Aggiornato")
-    data_loading.reload();
-    return;
-}
 
 export const remove_tag = async (ecom_wa_id: number, wa_id: number, tag: string) => {
     const { data, error } = await supabaseClient
@@ -344,6 +252,19 @@ export const remove_tag = async (ecom_wa_id: number, wa_id: number, tag: string)
         toasts.error("Impossibile rimuovere il tag")
         return;
     }
+    toasts.info("Il cliente non è più disiscritto")
+    data_loading.reload();
+}
+
+export const remove_customer = async (wa_id:number,ecom_wa_id:number) => {
+    const response = await fetch(`http://localhost:9999/api/rimuovicliente?number=${wa_id}&ecommercenumber=${ecom_wa_id}`, {
+      method: 'DELETE',
+    });
+    if(!response.ok){
+        toasts.error("Impossibile eliminare cliente")
+        return;
+    }
+    toasts.info("Il cliente è ora disiscritto")
     data_loading.reload();
 }
 
