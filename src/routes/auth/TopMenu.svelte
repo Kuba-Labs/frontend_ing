@@ -63,6 +63,11 @@
 				Statistiche
 			</a>
 		{/if}
+		{#if $page.params.current_number}
+			<a class="btn flex-grow bg-base-300" href={`/auth/${$page.params.current_number}/setup`}>
+				SETUP
+			</a>
+		{/if}
 
 		<a class="btn flex-grow bg-base-300" href="/auth">
 			<svg
