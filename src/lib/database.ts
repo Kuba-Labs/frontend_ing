@@ -98,7 +98,7 @@ export async function send_message(template: string, input: string, from: number
 
 export const get_templates = async (from: number): Promise<Template[]> => {
 
-    /*const response = await fetch(`${BASE_URL}/api/template?from=${from}`, {
+    const response = await fetch(`${BASE_URL}/api/template?from=${from}`, {
         method: 'GET',
     });
     if (!response.ok) {
@@ -115,8 +115,7 @@ export const get_templates = async (from: number): Promise<Template[]> => {
             name: value.name
         })
     }
-    return templates;*/
-    return [];
+    return templates;
 
 }
 
